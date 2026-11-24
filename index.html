@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Nika: A Little Adventure Through Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@500;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Rotate device warning for mobile portrait -->
+  <div id="rotate-device-screen" class="hidden">
+    <div class="rotate-card">
+      <div class="rotate-icon">📱↻</div>
+      <h2>Please Rotate Your Phone</h2>
+      <p>This little adventure is made to be experienced in landscape mode.</p>
+    </div>
+  </div>
+
+  <!-- Game container -->
+  <div id="game-container">
+    <canvas id="game-canvas" width="480" height="270"></canvas>
+
+    <!-- UI Overlay for Prompts, Modals & Notifications -->
+    <div id="ui-layer">
+      <!-- Top Left HUD Cluster -->
+      <div class="top-left-hud">
+        <div class="hud-top-row">
+          <div id="hud-chapter-badge">PROLOGUE</div>
+          <div id="health-bar" title="Nika's Hearts">
+            <span class="heart" id="heart-1">❤️</span>
+            <span class="heart" id="heart-2">❤️</span>
+            <span class="heart" id="heart-3">❤️</span>
+          </div>
+        </div>
+        <div class="hud-controls-row">
+          <button id="btn-audio" class="ui-icon-btn" aria-label="Toggle Sound">🔊</button>
+          <button id="btn-journal" class="ui-badge-btn" aria-label="Open Memories">📖 <span id="journal-counter">0</span></button>
+        </div>
+      </div>
+
+      <!-- Surprise Trap / Lost DD Toast -->
+      <div id="trap-toast" class="hidden">
+        <div class="trap-icon">💥</div>
+        <div class="trap-text">oops Lost DD !</div>
+      </div>
+
+      <!-- Race Countdown & Result Banner -->
+      <div id="race-banner" class="hidden">
+        <div id="race-banner-text">READY... GO!</div>
+      </div>
+
+      <!-- Memory Unlocked Toast Banner -->
+      <div id="memory-toast" class="hidden">
+        <div class="toast-icon">✨</div>
+        <div class="toast-content">
+          <div class="toast-header">MEMORY UNLOCKED</div>
+          <div id="toast-title">Coldest First Impression</div>
+          <div id="toast-desc">"its k" — Obby Royale, 2024</div>
+        </div>
+      </div>
+
+      <!-- Chapter Banner / Transition Overlay -->
+      <div id="chapter-banner" class="hidden">
+        <div class="chapter-content">
+          <div id="chapter-num">CHAPTER 1</div>
+          <h1 id="chapter-title">The Accidental Encounter</h1>
+          <p id="chapter-subtitle">Where it all started...</p>
+        </div>
+      </div>
+
+      <!-- Interaction Prompt -->
+      <div id="interaction-prompt" class="hidden">
+        <span class="key-badge">E</span> <span id="prompt-text">Talk</span>
+      </div>
+
+      <!-- Dialogue Box with Typewriter -->
+      <div id="dialogue-box" class="hidden">
+        <div class="dialogue-header">
+          <span id="dialogue-speaker">Gautam</span>
+        </div>
+        <div id="dialogue-text">...</div>
+        <div class="dialogue-footer">
+          <span class="dialogue-hint">Tap or press [E] to continue ▸</span>
+        </div>
+      </div>
+
+      <!-- Chapter 2: Online Chat Screen Overlay (Discord style) -->
+      <div id="chat-overlay" class="modal-overlay hidden">
+        <div class="chat-window">
+          <div class="chat-header">
+            <div class="chat-user-info">
+              <span class="chat-avatar gautam-avatar">G</span>
+              <div>
+                <div class="chat-username">Gautam</div>
+                <div class="chat-status"><span class="status-dot"></span> Online</div>
+              </div>
+            </div>
+            <button id="btn-close-chat" class="close-modal-btn">✕</button>
+          </div>
+          <div id="chat-messages-list" class="chat-messages-list">
+            <!-- Messages inserted dynamically with typing animations -->
+          </div>
+          <div id="chat-typing-indicator" class="chat-typing-indicator hidden">
+            <span class="typing-name">Gautam</span> is typing
+            <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+          </div>
+          <div class="chat-footer">
+            <button id="btn-chat-next" class="chat-send-btn">Next Message ▸</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Death Defier Golden Badge Celebration Modal -->
+      <div id="dd-celebration-modal" class="modal-overlay hidden">
+        <div class="dd-celebration-card">
+          <div class="dd-badge-icon-large">🏆 DD</div>
+          <div class="dd-badge-rays"></div>
+          <h2>DEATH DEFIER BADGE!</h2>
+          <p class="dd-subtitle">Two months of relentless grind, patience and unmatched determination in Obby Royale!</p>
+          <div class="dd-quote">"You proved everyone wrong, Nika. An absolute legend! ❤️"</div>
+          <button id="btn-close-dd" class="letter-action-btn">CLAIM LEGEND STATUS 🌟</button>
+        </div>
+      </div>
+
+      <!-- Memory Journal Modal -->
+      <div id="journal-modal" class="modal-overlay hidden">
+        <div class="journal-card">
+          <div class="modal-header">
+            <h2>📖 Memories of Us</h2>
+            <button id="btn-close-journal" class="close-modal-btn">✕</button>
+          </div>
+          <div id="journal-list" class="journal-list">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Birthday Letter Modal -->
+      <div id="letter-modal" class="modal-overlay hidden">
+        <div class="parchment-letter">
+          <div class="wax-seal">G ❤️ N</div>
+          <div class="letter-scroll-area">
+            <h1 class="letter-salutation" id="letter-salutation">Dear Nika,</h1>
+            <h3 class="letter-subtitle" id="letter-subtitle">Happy Birthday!! 🎉🎂</h3>
+            <div id="letter-body" class="letter-body">
+              <!-- Inserted dynamically via chapters.js -->
+            </div>
+            <div class="letter-footer">
+              <p id="letter-closing">With lots of love,</p>
+              <h2 id="letter-signature">Gautam ❤️</h2>
+            </div>
+          </div>
+          <div class="letter-actions">
+            <button id="btn-close-letter" class="letter-action-btn">Keep Close to Heart ❤️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- On-screen mobile controls (Touchscreen) -->
+    <div id="touch-controls">
+      <div class="touch-cluster left-cluster">
+        <button id="btn-left" class="touch-btn" aria-label="Move Left">◀</button>
+        <button id="btn-right" class="touch-btn" aria-label="Move Right">▶</button>
+      </div>
+      <div class="touch-cluster right-cluster">
+        <button id="btn-action" class="touch-btn action-btn hidden" aria-label="Attack / Shoot">⚔️</button>
+        <button id="btn-interact" class="touch-btn interact-btn hidden" aria-label="Interact">💬</button>
+        <button id="btn-jump" class="touch-btn jump-btn" aria-label="Jump">▲</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts in order -->
+  <script src="js/chapters.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
